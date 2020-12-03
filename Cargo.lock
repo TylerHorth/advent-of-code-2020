@@ -6,7 +6,7 @@ version = "0.1.0"
 dependencies = [
  "aoc-runner",
  "aoc-runner-derive",
- "scan_fmt",
+ "parse-display",
 ]
 
 [[package]]
@@ -66,6 +66,37 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ee1c47aaa256ecabcaea351eae4a9b01ef39ed810004e298d2511ed284b1525"
 
 [[package]]
+name = "once_cell"
+version = "1.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13bd41f508810a131401606d54ac32a467c97172d74ba7662562ebba5ad07fa0"
+
+[[package]]
+name = "parse-display"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12035532e456d9f4f59fcfa3834dc5f45b391d9029f5287292bf41960b05ce91"
+dependencies = [
+ "once_cell",
+ "parse-display-derive",
+ "regex",
+]
+
+[[package]]
+name = "parse-display-derive"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "449f5881ab953fa168d60a57dd182a3e1fdeff16bb9bdd309145fbd8f32326ec"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "regex-syntax",
+ "syn",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -106,15 +137,6 @@ name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
-
-[[package]]
-name = "scan_fmt"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "248286eec0f55678879ef1caec3d76276643ebcb5460d8cb6e732ef40f50aabe"
-dependencies = [
- "regex",
-]
 
 [[package]]
 name = "serde"

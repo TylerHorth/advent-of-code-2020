@@ -1,6 +1,8 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use scan_fmt::scan_fmt;
+use parse_display::{Display, FromStr, ParseError};
 
+#[derive(Display, FromStr)]
+#[display("{start}-{end} {char}: {password}")]
 struct Line {
     start: usize,
     end: usize,
@@ -9,20 +11,8 @@ struct Line {
 }
 
 #[aoc_generator(day2)]
-fn parse(input: &str) -> Vec<Line> {
-    input
-        .lines()
-        .map(|l| {
-            let (start, end, char, password) =
-                scan_fmt!(l, "{}-{} {}: {}", usize, usize, char, String).unwrap();
-            Line {
-                start,
-                end,
-                char,
-                password,
-            }
-        })
-        .collect()
+fn parse(input: &str) -> Result<Vec<Line>, ParseError> {
+    input.lines().map(str::parse).collect()
 }
 
 #[aoc(day2, part1)]
