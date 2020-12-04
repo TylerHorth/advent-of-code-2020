@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use aoc_runner_derive::{aoc, aoc_generator};
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use parse_display::{Display, FromStr};
 use regex::Regex;
@@ -23,26 +24,15 @@ enum Height {
 
 #[aoc_generator(day4)]
 fn parse(input: &str) -> Vec<HashMap<String, String>> {
-    let mut result = Vec::new();
-    let mut passport = HashMap::new();
-
-    for line in input.lines() {
-        if line.is_empty() {
-            result.push(passport);
-            passport = HashMap::new();
-        } else {
-            for entry in line.split_whitespace() {
-                let mut it = entry.split(':');
-                let key = it.next().unwrap().to_string();
-                let value = it.next().unwrap().to_string();
-                passport.insert(key, value);
-            }
-        }
-    }
-
-    result.push(passport);
-
-    result
+    input
+        .split("\n\n")
+        .map(|passport| {
+            passport
+                .split_whitespace()
+                .map(|entry| entry.split(":").map(str::to_string).next_tuple().unwrap())
+                .collect()
+        })
+        .collect()
 }
 
 #[aoc(day4, part1)]
