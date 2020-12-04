@@ -6,7 +6,9 @@ version = "0.1.0"
 dependencies = [
  "aoc-runner",
  "aoc-runner-derive",
+ "lazy_static",
  "parse-display",
+ "regex",
 ]
 
 [[package]]
