@@ -17,7 +17,7 @@ fn parse(input: &str) -> Vec<Vec<u32>> {
 }
 
 fn char_value(c: char) -> u32 {
-    1 << (c as usize - 'a' as usize)
+    1 << (c as u8 - b'a')
 }
 
 fn sum_by_rule(groups: &Vec<Vec<u32>>, rule: fn(u32, u32) -> u32) -> u32 {
