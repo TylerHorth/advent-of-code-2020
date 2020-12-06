@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use aoc_runner_derive::{aoc, aoc_generator};
 
 #[aoc_generator(day5)]
@@ -18,6 +16,20 @@ fn char_value(c: char) -> u16 {
     }
 }
 
+fn xor_up_to(n: u16) -> u16 {
+    match n & 0b11 {
+        0b00 => n,
+        0b01 => 1,
+        0b10 => n | 1,
+        0b11 => 0,
+        _ => unreachable!(),
+    }
+}
+
+fn xor_between(low: u16, high: u16) -> u16 {
+    xor_up_to(low - 1) ^ xor_up_to(high)
+}
+
 #[aoc(day5, part1)]
 fn part1(seats: &[u16]) -> u16 {
     seats.iter().copied().max().unwrap()
@@ -25,10 +37,9 @@ fn part1(seats: &[u16]) -> u16 {
 
 #[aoc(day5, part2)]
 fn part2(seats: &[u16]) -> u16 {
-    let seats: HashSet<u16> = seats.iter().copied().collect();
+    let (min, max, xor) = seats.iter().fold((0, 0, 0), |(min, max, xor), &id| {
+        (min.min(id), max.max(id), xor ^ id)
+    });
 
-    (0..=0b1111111111)
-        .skip_while(|id| !seats.contains(id))
-        .find(|id| !seats.contains(id))
-        .unwrap()
+    xor_between(min, max) ^ xor
 }
