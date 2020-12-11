@@ -105,8 +105,9 @@ impl Map {
     fn total_occupied(&self) -> usize {
         self.tiles
             .iter()
-            .map(|row| row.iter().filter(|t| matches!(t, Tile::Occupied)).count())
-            .sum()
+            .flatten()
+            .filter(|t| matches!(t, Tile::Occupied))
+            .count()
     }
 }
 
