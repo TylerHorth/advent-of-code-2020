@@ -42,14 +42,14 @@ trait Navigate {
 
 struct SimpleShip {
     position: (i64, i64),
-    facing: i64,
+    direction: i64,
 }
 
 impl SimpleShip {
     fn new() -> Self {
         Self {
             position: (0, 0),
-            facing: 90,
+            direction: 90,
         }
     }
 }
@@ -61,11 +61,11 @@ impl Navigate for SimpleShip {
     }
 
     fn rotate(&mut self, degrees: i64) {
-        self.facing = (self.facing + degrees) % 360;
+        self.direction = (self.direction + degrees) % 360;
     }
 
     fn forward(&mut self, units: i64) {
-        match self.facing {
+        match self.direction {
             0 => self.position.1 += units,
             90 => self.position.0 += units,
             180 => self.position.1 -= units,
