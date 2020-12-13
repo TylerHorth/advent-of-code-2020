@@ -37,7 +37,7 @@ fn part1(seats: &[u16]) -> u16 {
 
 #[aoc(day5, part2)]
 fn part2(seats: &[u16]) -> u16 {
-    let (min, max, xor) = seats.iter().fold((0, 0, 0), |(min, max, xor), &id| {
+    let (min, max, xor) = seats.iter().fold((u16::MAX, 0, 0), |(min, max, xor), &id| {
         (min.min(id), max.max(id), xor ^ id)
     });
 
