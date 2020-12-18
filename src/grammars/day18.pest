@@ -1,0 +1,12 @@
+int = @{ ASCII_DIGIT+ }
+
+operation = _{ add | multiply }
+    add = { "+" }
+    multiply = { "*" }
+
+expression = { term ~ (operation ~ term)* }
+term = _{ int | "(" ~ expression ~ ")" }
+
+homework = _{ SOI ~ expression ~ (NEWLINE ~ expression)* }
+
+WHITESPACE = _{ " " }
