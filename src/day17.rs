@@ -1,181 +1,92 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use aoc_runner_derive::{aoc, aoc_generator};
+use itertools::Itertools;
 
 #[aoc_generator(day17)]
-fn parse(input: &str) -> HashSet<(i32, i32, i32)> {
+fn parse(input: &str) -> Vec<(i32, i32)> {
     input
         .lines()
         .enumerate()
         .flat_map(|(i, line)| {
-            line
-                .chars()
-                .enumerate()
-                .filter_map(move |(j, c)| if c == '#' { Some((i as i32, j as i32, 0)) } else { None })
-            }
-        )
+            line.chars().enumerate().filter_map(move |(j, c)| {
+                if c == '#' {
+                    Some((i as i32, j as i32))
+                } else {
+                    None
+                }
+            })
+        })
         .collect()
 }
 
-fn sim(active: &HashSet<(i32, i32, i32)>) -> HashSet<(i32, i32, i32)> {
-    let mut update = active.clone();
-
-    let (mut min_x, mut min_y, mut min_z) = (0, 0, 0);
-    let (mut max_x, mut max_y, mut max_z) = (0, 0, 0);
-
-    for &(x, y, z) in active.iter() {
-        min_x = min_x.min(x);
-        min_y = min_y.min(y);
-        min_z = min_z.min(z);
-
-        max_x = max_x.max(x);
-        max_y = max_y.max(y);
-        max_z = max_z.max(z);
-
-        let mut num_active = 0;
-
-        for i in (x - 1)..=(x + 1) {
-            for j in (y - 1)..=(y + 1) {
-                for k in (z - 1)..=(z + 1) {
-                    if i == x && j == y && k == z {
-                        continue
-                    }
-                    if active.contains(&(i, j, k)) {
-                        num_active += 1;
-                    }
-                }
-            }
-        }
-
-        if num_active != 2 && num_active != 3 {
-            update.remove(&(x, y, z));
-        }
-    }
-
-    for x in (min_x-1)..=(max_x+1) {
-        for y in (min_y-1)..=(max_y+1) {
-            for z in (min_z-1)..=(max_z+1) {
-                if active.contains(&(x, y, z)) {
-                    continue
-                }
-
-                let mut num_active = 0;
-
-                for i in (x - 1)..=(x + 1) {
-                    for j in (y - 1)..=(y + 1) {
-                        for k in (z - 1)..=(z + 1) {
-                            if i == x && j == y && k == z {
-                                continue
-                            }
-                            if active.contains(&(i, j, k)) {
-                                num_active += 1;
-                            }
-                        }
-                    }
-                }
-
-                if num_active == 3 {
-                    update.insert((x, y, z));
-                }
-            }
-        }
-    }
-
-    update
+struct Space {
+    active: HashSet<Vec<i32>>,
 }
 
-fn sim4(active: &HashSet<(i32, i32, i32, i32)>) -> HashSet<(i32, i32, i32, i32)> {
-    let mut update = active.clone();
+impl Space {
+    fn new(initial: &Vec<(i32, i32)>, dimensions: usize) -> Self {
+        assert!(dimensions >= 2);
 
-    let (mut min_x, mut min_y, mut min_z, mut min_q) = (0, 0, 0, 0);
-    let (mut max_x, mut max_y, mut max_z, mut max_q) = (0, 0, 0, 0);
+        let active = initial
+            .iter()
+            .map(|&(x, y)| {
+                let mut point = vec![0; dimensions];
 
-    for &(x, y, z, q) in active.iter() {
-        min_x = min_x.min(x);
-        min_y = min_y.min(y);
-        min_z = min_z.min(z);
-        min_q = min_q.min(q);
+                point[0] = x;
+                point[1] = y;
 
-        max_x = max_x.max(x);
-        max_y = max_y.max(y);
-        max_z = max_z.max(z);
-        max_q = max_q.max(q);
+                point
+            })
+            .collect();
 
-        let mut num_active = 0;
-
-        for i in (x - 1)..=(x + 1) {
-            for j in (y - 1)..=(y + 1) {
-                for k in (z - 1)..=(z + 1) {
-                    for l in (q - 1)..=(q + 1) {
-                        if i == x && j == y && k == z && l == q {
-                            continue
-                        }
-                        if active.contains(&(i, j, k, l)) {
-                            num_active += 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        if num_active != 2 && num_active != 3 {
-            update.remove(&(x, y, z, q));
-        }
+        Self { active }
     }
 
-    for x in (min_x-1)..=(max_x+1) {
-        for y in (min_y-1)..=(max_y+1) {
-            for z in (min_z-1)..=(max_z+1) {
-                for q in (min_q-1)..=(max_q+1) {
-                    if active.contains(&(x, y, z, q)) {
-                        continue
-                    }
-
-                    let mut num_active = 0;
-
-                    for i in (x - 1)..=(x + 1) {
-                        for j in (y - 1)..=(y + 1) {
-                            for k in (z - 1)..=(z + 1) {
-                                for l in (q - 1)..=(q + 1) {
-                                    if i == x && j == y && k == z && l == q {
-                                        continue
-                                    }
-                                    if active.contains(&(i, j, k, l)) {
-                                        num_active += 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if num_active == 3 {
-                        update.insert((x, y, z, q));
-                    }
-                }
-            }
-        }
+    fn neighbors<'a>(&self, point: &'a Vec<i32>) -> impl Iterator<Item = Vec<i32>> + 'a {
+        point
+            .iter()
+            .map(|n| (n - 1)..=(n + 1))
+            .multi_cartesian_product()
+            .filter(move |neighbor| neighbor != point)
     }
 
-    update
+    fn sim(&mut self) {
+        let mut num_active = HashMap::new();
+
+        self.active
+            .iter()
+            .flat_map(|point| self.neighbors(point))
+            .for_each(|point| *num_active.entry(point).or_default() += 1);
+
+        self.active
+            .retain(|point| (2..=3).contains(num_active.get(point).unwrap_or(&0)));
+
+        self.active
+            .extend(num_active.into_iter().filter_map(|(point, active)| {
+                if active == 3 {
+                    Some(point)
+                } else {
+                    None
+                }
+            }));
+    }
+
+    fn run(&mut self) -> usize {
+        for _ in 0..6 {
+            self.sim();
+        }
+
+        self.active.len()
+    }
 }
 
 #[aoc(day17, part1)]
-fn part1(active: &HashSet<(i32, i32, i32)>) -> usize {
-    let mut active = sim(active);
-    for _ in 1..6 {
-        active = sim(&active);
-    }
-
-    active.len()
+fn part1(active: &Vec<(i32, i32)>) -> usize {
+    Space::new(active, 3).run()
 }
 
 #[aoc(day17, part2)]
-fn part2(active: &HashSet<(i32, i32, i32)>) -> usize {
-    let mut active = active.iter().copied().map(|(x, y, z)| (x, y, z, 0)).collect();
-    
-    for _ in 0..6 {
-        active = sim4(&active);
-    }
-
-    active.len()
+fn part2(active: &Vec<(i32, i32)>) -> usize {
+    Space::new(active, 4).run()
 }
