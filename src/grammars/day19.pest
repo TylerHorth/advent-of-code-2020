@@ -1,0 +1,11 @@
+int = @{ ASCII_DIGIT+ }
+
+char = { 'a'..'z' }
+
+seq = { int ~ (" " ~ int)* }
+
+alt = { (seq ~ (" | " ~ seq)*) }
+
+rule = { int ~ ": " ~ (("\"" ~ char ~ "\"") | alt)}
+
+all = _{ SOI ~ rule ~ (NEWLINE ~ rule)* ~ EOI }
