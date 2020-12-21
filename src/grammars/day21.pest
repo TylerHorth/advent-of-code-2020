@@ -1,0 +1,9 @@
+word = { ASCII_ALPHA+ }
+
+ingredients = { (word ~ " ")+ }
+
+allergens = { "(contains " ~ word ~ (", " ~ word)* ~ ")" }
+
+food = { ingredients ~ allergens }
+
+all = _{ SOI ~ food ~ (NEWLINE ~ food)* ~ EOI }
