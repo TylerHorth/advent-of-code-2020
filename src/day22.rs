@@ -58,17 +58,36 @@ fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
         let (c1, c2) = (p1.pop_front().unwrap(), p2.pop_front().unwrap());
 
         if p1.len() >= c1 as usize && p2.len() >= c2 as usize {
-            match recursive_combat(
-                p1.iter().copied().take(c1 as usize).collect(),
-                p2.iter().copied().take(c2 as usize).collect(),
-            ) {
-                Winner::P1(_) => {
-                    p1.push_back(c1);
-                    p1.push_back(c2);
-                }
-                Winner::P2(_) => {
-                    p2.push_back(c2);
-                    p2.push_back(c1);
+            // Hypothesis: the deck with the largest card wins, or there is a cycle.
+            // Base case: If not enough cards remain to do a recursive step, then the
+            //      largest card can never be stolen. Thus, either the player with the
+            //      largest card wins, or there is a cycle.
+            // Inductive step: If the largest card remains in the deck for the recursive
+            //      step, then by the inductive hypothesis either the player with said
+            //      card wins, or there is a cycle. If the largest card is drawn, since
+            //      all numbers are positive and there are no duplicates, it is imposible
+            //      for enough cards to remain in the deck to do a recursive step. Thus,
+            //      we are in the base case.
+            //
+            // Since a cycle results in a win for player 1, if player 1 has the largest
+            // card, he will win the subgame.
+
+            let p1_iter = p1.iter().copied().take(c1 as usize);
+            let p2_iter = p2.iter().copied().take(c2 as usize);
+
+            if p1_iter.clone().max() > p2_iter.clone().max() {
+                p1.push_back(c1);
+                p1.push_back(c2);
+            } else {
+                match recursive_combat(p1_iter.collect(), p2_iter.collect()) {
+                    Winner::P1(_) => {
+                        p1.push_back(c1);
+                        p1.push_back(c2);
+                    }
+                    Winner::P2(_) => {
+                        p2.push_back(c2);
+                        p2.push_back(c1);
+                    }
                 }
             }
         } else {
