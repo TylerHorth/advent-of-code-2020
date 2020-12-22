@@ -1,6 +1,8 @@
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
+use std::hash::{Hash, Hasher};
 
 use aoc_runner_derive::{aoc, aoc_generator};
+use fnv::{FnvHasher, FnvHashSet};
 use itertools::Itertools;
 
 #[aoc_generator(day22)]
@@ -48,10 +50,15 @@ enum Winner {
 }
 
 fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
-    let mut seen = HashSet::new();
+    let mut seen = FnvHashSet::default();
 
     while !p1.is_empty() && !p2.is_empty() {
-        if !seen.insert((p1.clone(), p2.clone())) {
+        let mut hasher = FnvHasher::default();
+        p1.hash(&mut hasher);
+        p2.hash(&mut hasher);
+
+        // Collisions are extremely unlikely
+        if !seen.insert(hasher.finish()) {
             return Winner::P1(score(p1));
         }
 
