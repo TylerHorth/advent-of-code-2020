@@ -45,11 +45,11 @@ fn part1(decks: &(VecDeque<u8>, VecDeque<u8>)) -> u64 {
 }
 
 enum Winner {
-    P1(u64),
-    P2(u64),
+    P1,
+    P2,
 }
 
-fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
+fn recursive_combat(p1: &mut VecDeque<u8>, p2: &mut VecDeque<u8>) -> Winner {
     let mut seen = FnvHashSet::default();
 
     while !p1.is_empty() && !p2.is_empty() {
@@ -59,7 +59,7 @@ fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
 
         // Collisions are extremely unlikely
         if !seen.insert(hasher.finish()) {
-            return Winner::P1(score(p1));
+            return Winner::P1;
         }
 
         let (c1, c2) = (p1.pop_front().unwrap(), p2.pop_front().unwrap());
@@ -86,12 +86,12 @@ fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
                 p1.push_back(c1);
                 p1.push_back(c2);
             } else {
-                match recursive_combat(p1_iter.collect(), p2_iter.collect()) {
-                    Winner::P1(_) => {
+                match recursive_combat(&mut p1_iter.collect(), &mut p2_iter.collect()) {
+                    Winner::P1 => {
                         p1.push_back(c1);
                         p1.push_back(c2);
                     }
-                    Winner::P2(_) => {
+                    Winner::P2 => {
                         p2.push_back(c2);
                         p2.push_back(c1);
                     }
@@ -109,18 +109,18 @@ fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
     }
 
     if p1.is_empty() {
-        Winner::P2(score(p2))
+        Winner::P2
     } else {
-        Winner::P1(score(p1))
+        Winner::P1
     }
 }
 
 #[aoc(day22, part2)]
 fn part2(decks: &(VecDeque<u8>, VecDeque<u8>)) -> u64 {
-    let (p1, p2) = decks.clone();
+    let (mut p1, mut p2) = decks.clone();
 
-    match recursive_combat(p1, p2) {
-        Winner::P1(score) => score,
-        Winner::P2(score) => score,
+    match recursive_combat(&mut p1, &mut p2) {
+        Winner::P1 => score(p1),
+        Winner::P2 => score(p2),
     }
 }
