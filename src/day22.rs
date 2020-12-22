@@ -65,7 +65,7 @@ fn recursive_combat(mut p1: VecDeque<u8>, mut p2: VecDeque<u8>) -> Winner {
             // Inductive step: If the largest card remains in the deck for the recursive
             //      step, then by the inductive hypothesis either the player with said
             //      card wins, or there is a cycle. If the largest card is drawn, since
-            //      all numbers are positive and there are no duplicates, it is imposible
+            //      all numbers are positive and there are no duplicates, it is impossible
             //      for enough cards to remain in the deck to do a recursive step. Thus,
             //      we are in the base case.
             //
