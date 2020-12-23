@@ -83,10 +83,7 @@ fn part2((fields, my_ticket, nearby_tickets): &(Vec<Field>, Vec<usize>, Vec<Vec<
     let mut product = 1;
 
     for (i, possible) in possible_fields {
-        let possible = &possible - &used;
-        assert_eq!(possible.len(), 1, "gready solution failed");
-
-        let field_index = *possible.iter().next().unwrap();
+        let field_index = (&possible - &used).into_iter().exactly_one().unwrap();
 
         if fields[field_index].name.starts_with("departure") {
             product *= my_ticket[i];
